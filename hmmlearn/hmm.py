@@ -488,10 +488,11 @@ class MultinomialHMM(_BaseHMM):
         symbols = []
         for seq in obs:
             symbols.extend(np.concatenate(seq))
-            if (len(symbols) == 1 or          # not enough data
-                symbols.dtype.kind != 'i' or  # not an integer
-                np.any(symbols < 0)):         # contains negative integers
-                return False
+        symbols = np.array(symbols)
+        if (len(symbols) == 1 or          # not enough data
+            symbols.dtype.kind != 'i' or  # not an integer
+            np.any(symbols < 0)):         # contains negative integers
+            return False
 
         symbols.sort()
         return np.all(np.diff(symbols) <= 1)
