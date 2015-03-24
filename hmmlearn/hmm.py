@@ -444,7 +444,8 @@ class MultinomialHMM(_BaseHMM):
             if not hasattr(self, 'n_symbols'):
                 symbols = set()
                 for o in obs:
-                    symbols = symbols.union(set(o))
+                    for s in o:
+                        symbols = symbols.union(set(s))
                 self.n_symbols = len(symbols)
             emissionprob = normalize(self.random_state.rand(self.n_components,
                                                             self.n_symbols), 1)
