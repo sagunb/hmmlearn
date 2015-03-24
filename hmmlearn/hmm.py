@@ -478,14 +478,18 @@ class MultinomialHMM(_BaseHMM):
         range ``[min(obs), max(obs)]``, such that each integer from the range
         occurs in ``obs`` at least once.
 
-        For example ``[0, 0, 2, 1, 3, 1, 1]`` is a valid sample from a
-        Multinomial distribution, while ``[0, 0, 3, 5, 10]`` is not.
+        For example ``[[0], [0], [2], [1], [3], [1], [1]]``
+        and ``[[0, 1, 2], [0], [2, 3], [1, 1], [3], [1], [1, 1, 1]]`` are valid samples from a
+        Multinomial distribution, while ``[[0], [0], [3], [5], [10]]`` and
+        ``[[0, 10], [0], [3, 7], [5, 5], [10]]`` are not.
         """
-        symbols = np.concatenate(obs)
-        if (len(symbols) == 1 or          # not enough data
-            symbols.dtype.kind != 'i' or  # not an integer
-            np.any(symbols < 0)):         # contains negative integers
-            return False
+        symbols = []
+        for seq in obs:
+            symbols.extend(np.concatenate(seq))
+            if (len(symbols) == 1 or          # not enough data
+                symbols.dtype.kind != 'i' or  # not an integer
+                np.any(symbols < 0)):         # contains negative integers
+                return False
 
         symbols.sort()
         return np.all(np.diff(symbols) <= 1)
