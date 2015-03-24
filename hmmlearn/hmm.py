@@ -463,8 +463,9 @@ class MultinomialHMM(_BaseHMM):
             stats, obs, framelogprob, posteriors, fwdlattice, bwdlattice,
             params)
         if 'e' in params:
-            for t, symbol in enumerate(obs):
-                stats['obs'][:, symbol] += posteriors[t]
+            for t, emittances in enumerate(obs):
+                for symbol in emittances:
+                    stats['obs'][:, symbol] += posteriors[t]
 
     def _do_mstep(self, stats, params):
         super(MultinomialHMM, self)._do_mstep(stats, params)
