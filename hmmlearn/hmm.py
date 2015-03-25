@@ -427,7 +427,10 @@ class MultinomialHMM(_BaseHMM):
     emissionprob_ = property(_get_emissionprob, _set_emissionprob)
 
     def _compute_log_likelihood(self, obs):
-        return self._log_emissionprob[:, obs].T
+        framelogprob = np.zeros((self.n_components, len(obs)))
+        for idx, emittance in enumerate(obs):
+            framelogprob[:, idx] += obs[:, emittance].sum(axis=1)
+        return framelogprob.T
 
     def _generate_sample_from_state(self, state, random_state=None):
         cdf = np.cumsum(self.emissionprob_[state, :])
