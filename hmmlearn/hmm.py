@@ -464,8 +464,9 @@ class MultinomialHMM(_BaseHMM):
             params)
         if 'e' in params:
             for t, emittances in enumerate(obs):
+                emittance_size = float(len(emittances))
                 for symbol in emittances:
-                    stats['obs'][:, symbol] += posteriors[t]
+                    stats['obs'][:, symbol] += posteriors[t] / emittance_size
 
     def _do_mstep(self, stats, params):
         super(MultinomialHMM, self)._do_mstep(stats, params)
