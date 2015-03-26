@@ -522,6 +522,60 @@ class MultinomialHMM(_BaseHMM):
         return _BaseHMM.fit(self, obs, **kwargs)
 
 
+class BakisMultinomialHMM(MultinomialHMM):
+
+    def __init__(self, n_components=1, startprob=None, transmat=None,
+                 startprob_prior=None, transmat_prior=None,
+                 algorithm="viterbi", random_state=None,
+                 n_iter=10, thresh=1e-2, params=string.ascii_letters,
+                 init_params=string.ascii_letters):
+        """Create a hidden Markov model with multinomial emissions.
+
+        Parameters
+        ----------
+        n_components : int
+            Number of states.
+        """
+        _BaseHMM.__init__(self, n_components, startprob, transmat,
+                          startprob_prior=startprob_prior,
+                          transmat_prior=transmat_prior,
+                          algorithm=algorithm,
+                          random_state=random_state,
+                          n_iter=n_iter,
+                          thresh=thresh,
+                          params=params,
+                          init_params=init_params)
+
+    def _get_transmat(self):
+        """Matrix of transition probabilities."""
+        transmat = np.exp(self._log_transmat)
+        transmat = transmat * (np.eye(self.n_components) + np.eye(self.n_components, k=1))
+        return transmat
+
+    def _set_transmat(self, transmat):
+        if transmat is None:
+            transmat = np.tile(1.0 / self.n_components,
+                               (self.n_components, self.n_components))
+
+        # check if there exists a component whose value is exactly zero
+        # if so, add a small number and re-normalize
+        if not np.alltrue(transmat):
+            normalize(transmat, axis=1)
+
+        if (np.asarray(transmat).shape
+                != (self.n_components, self.n_components)):
+            raise ValueError('transmat must have shape '
+                             '(n_components, n_components)')
+        if not np.all(np.allclose(np.sum(transmat, axis=1), 1.0)):
+            raise ValueError('Rows of transmat must sum to 1.0')
+
+        self._log_transmat = np.log(np.asarray(transmat).copy())
+        underflow_idx = np.isnan(self._log_transmat)
+        self._log_transmat[underflow_idx] = NEGINF
+
+    transmat_ = property(_get_transmat, _set_transmat)
+
+
 class GMMHMM(_BaseHMM):
     """Hidden Markov Model with Gaussin mixture emissions
 
