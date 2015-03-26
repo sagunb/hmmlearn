@@ -102,6 +102,8 @@ class _BaseHMM(BaseEstimator):
         self.transmat_prior = transmat_prior
         self.algorithm = algorithm
         self.random_state = random_state
+        self.num_iterations_performed = 0
+        self.threshold_reached = 999999
 
     def eval(self, X):
         return self.score_samples(X)
@@ -386,6 +388,8 @@ class _BaseHMM(BaseEstimator):
             logprob.append(curr_logprob)
 
             # Check for convergence.
+            self.num_iterations_performed = i
+            self.threshold_reached = logprob[-1] - logprob[-2]
             if i > 0 and logprob[-1] - logprob[-2] < self.thresh:
                 break
 
