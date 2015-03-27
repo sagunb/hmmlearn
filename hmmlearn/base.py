@@ -102,6 +102,7 @@ class _BaseHMM(BaseEstimator):
         self.transmat_prior = transmat_prior
         self.algorithm = algorithm
         self.random_state = random_state
+        self.logprob_ = None
         self.num_iterations_performed = 0
         self.threshold_reached = 999999
 
@@ -386,6 +387,7 @@ class _BaseHMM(BaseEstimator):
                     stats, seq, framelogprob, posteriors, fwdlattice,
                     bwdlattice, self.params)
             logprob.append(curr_logprob)
+            self.logprob_ = curr_logprob
 
             # Check for convergence.
             self.num_iterations_performed = i
