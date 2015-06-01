@@ -391,10 +391,10 @@ class _BaseHMM(BaseEstimator):
 
             # Check for convergence.
             self.num_iterations_performed = i
-            self.threshold_reached = logprob[-1] - logprob[-2]
-            if i > 0 and logprob[-1] - logprob[-2] < self.thresh:
+            if i > 0:
                 self.threshold_reached = logprob[-1] - logprob[-2]
-                break
+                if self.threshold_reached < self.thresh:
+                    break
 
             # Maximization step
             self._do_mstep(stats, self.params)
