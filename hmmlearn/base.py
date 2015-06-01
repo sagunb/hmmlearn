@@ -391,6 +391,7 @@ class _BaseHMM(BaseEstimator):
 
             # Check for convergence.
             self.num_iterations_performed = i
+            self.threshold_reached = logprob[-1] - logprob[-2]
             if i > 0 and logprob[-1] - logprob[-2] < self.thresh:
                 self.threshold_reached = logprob[-1] - logprob[-2]
                 break
